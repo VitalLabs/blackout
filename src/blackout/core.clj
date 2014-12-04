@@ -5,21 +5,21 @@
             [clojure.core.async :refer :all
              :exclude [map into reduce merge take partition partition-by]]
             [cheshire.core :as json]
+            [environ.core :refer [env]]
             [clojure.tools.logging :as log]))
 
-(def ^:dynamic *host* "localhost")
-(def ^:dynamic *port* 8080)
+(def ^:dynamic *account* nil)
 
 (defn make-uri
   [route]
-  (str "http://" *host* ":" *port* route))
+  (str "http://" (env :switchboard-host) ":" (env :switchboard-port) route))
 
 (defn post
   [route body]
   (http/post (make-uri route)
              {:content-type :json
               :accept :json
-              :body (json/generate-string body)}))
+              :body (json/generate-string (assoc-in body [:args :app] 1))}))
 
 (defn create-account
   []
@@ -27,8 +27,7 @@
                                            :args {:account ""
                                                   :demog ""
                                                   :auth ""
-                                                  :settings {}
-                                                  :app 1}
+                                                  :settings {}}
                                            :groups {}
                                            :password ""})
                  (fn [x]
@@ -36,8 +35,16 @@
                  (fn [x]
                    (log/error x))))
 
+(defn login
+  [username password]
+  (post "/api/v1/login" {:action "login"
+                         :args {:username username
+                                :password password}}))
+
 (defn -main
-  [& {:keys [host port]}]
-  (binding [*host* (or host *host*)
-            *port* (or port *port*)]
-    ))
+  [& args]
+  (binding [*account* nil]
+    (let [login-res @(login (env :switchboard-admin-username)
+                            (env :switchboard-admin-password))]
+      (when (== (:status login-res) 200)
+        (log/info login-res)))))

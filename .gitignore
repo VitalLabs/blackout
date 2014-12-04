@@ -14,3 +14,4 @@ pom.xml.asc
 /.sass-cache
 riemann.log
 .nrepl-port
+.lein-env
