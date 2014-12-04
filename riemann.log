@@ -1,4 +1,0 @@
-INFO [2014-12-04 13:18:10,461] clojure-agent-send-off-pool-0 - riemann.transport.websockets - Websockets server 127.0.0.1 5556 online
-INFO [2014-12-04 13:18:10,461] clojure-agent-send-off-pool-5 - riemann.transport.tcp - TCP server 127.0.0.1 5555 online
-INFO [2014-12-04 13:18:10,491] clojure-agent-send-off-pool-1 - riemann.transport.udp - UDP server 127.0.0.1 5555 16384 online
-INFO [2014-12-04 13:18:10,491] main - riemann.core - Hyperspace core online
