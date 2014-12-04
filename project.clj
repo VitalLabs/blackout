@@ -6,6 +6,8 @@
   :dependencies [[org.clojure/clojure "1.7.0-alpha4"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/tools.logging "0.3.1"]
+                 [org.clojure/test.check "0.6.1"]
+                 [com.stuartsierra/component "0.2.2"]
                  [riemann-clojure-client "0.2.11"]
                  [aleph "0.4.0-alpha9"]                 
                  [cheshire "5.3.1"]]

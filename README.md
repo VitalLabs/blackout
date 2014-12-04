@@ -10,6 +10,12 @@ a. `brew install riemann`
 
 b. `sudo gem install riemann-client riemann-tools riemann-dash`
 
+c. `riemann /usr/local/etc/riemann.config` 
+
+d. `riemann-dash`
+
+e. Open your web browser to http://localhost:4567
+
 ## Copyright and License
 
 Copyright © 2014 Vital Labs, Inc.
