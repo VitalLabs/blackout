@@ -3,6 +3,11 @@
   :url "https://github.com/VitalLabs/blackout"
   :license {:name "Proprietary"
             :url "http://vitallabs.co/"}
-  :dependencies [[org.clojure/clojure "1.7.0-alpha4"]]
+  :dependencies [[org.clojure/clojure "1.7.0-alpha4"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [org.clojure/tools.logging "0.3.1"]
+                 [riemann-clojure-client "0.2.11"]
+                 [aleph "0.4.0-alpha9"]                 
+                 [cheshire "5.3.1"]]
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]]
                    :source-paths ["dev"]}})
