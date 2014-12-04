@@ -12,7 +12,7 @@
 
 (defn make-uri
   [route]
-  (str "http://" *host* *port* route))
+  (str "http://" *host* ":" *port* route))
 
 (defn post
   [route body]
@@ -27,11 +27,14 @@
                                            :args {:account ""
                                                   :demog ""
                                                   :auth ""
-                                                  :settings {}}
+                                                  :settings {}
+                                                  :app 1}
                                            :groups {}
                                            :password ""})
-                 (fn [x] (log/info x))
-                 (fn [x] (log/error x))))
+                 (fn [x]
+                   (log/info (slurp (:body x))))
+                 (fn [x]
+                   (log/error x))))
 
 (defn -main
   [& {:keys [host port]}]
