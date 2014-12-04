@@ -22,8 +22,8 @@
                      :accept :json
                      :body (-> (assoc-in body [:args :app] 1)
                                (json/generate-string))}
-                    {:headers (when *session-cookie*
-                                {"set-cookie" *session-cookie*})})))
+                    (when *session-cookie*
+                      {:headers {:cookie *session-cookie*}}))))
 
 (defn create-account
   []
@@ -51,4 +51,4 @@
       (assert (== (:status res) 200) body)
       (set! *account* (:result (json/parse-string body true)))
       (set! *session-cookie* (get (:headers res) "set-cookie"))
-      (bs/to-string (:body @(create-account))))))
+      @(create-account))))
