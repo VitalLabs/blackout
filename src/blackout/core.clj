@@ -44,7 +44,8 @@
 (defn -main
   [& args]
   (binding [*account* nil]
-    (let [login-res @(login (env :switchboard-admin-username)
-                            (env :switchboard-admin-password))]
-      (when (== (:status login-res) 200)
-        (log/info login-res)))))
+    (let [res @(login (env :switchboard-admin-username)
+                      (env :switchboard-admin-password))
+          body (bs/to-string (:body res))]
+      (assert (== (:status res) 200) body)
+      (set! *account* (json/parse-string body true)))))
