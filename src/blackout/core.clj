@@ -9,6 +9,7 @@
             [clojure.tools.logging :as log]))
 
 (def ^:dynamic *account* nil)
+(def ^:dynamic *session-cookie* nil)
 
 (defn make-uri
   [route]
@@ -17,23 +18,22 @@
 (defn post
   [route body]
   (http/post (make-uri route)
-             {:content-type :json
-              :accept :json
-              :body (json/generate-string (assoc-in body [:args :app] 1))}))
+             (merge {:content-type :json
+                     :accept :json
+                     :body (-> (assoc-in body [:args :app] 1)
+                               (json/generate-string))}
+                    {:headers (when *session-cookie*
+                                {"set-cookie" *session-cookie*})})))
 
 (defn create-account
   []
-  (d/on-realized (post "/api/v1/accounts" {:action "create"
-                                           :args {:account ""
-                                                  :demog ""
-                                                  :auth ""
-                                                  :settings {}}
-                                           :groups {}
-                                           :password ""})
-                 (fn [x]
-                   (log/info (slurp (:body x))))
-                 (fn [x]
-                   (log/error x))))
+  (post "/api/v1/accounts" {:action "create"
+                            :args {:account ""
+                                   :demog ""
+                                   :auth (:auth *account*)
+                                   :settings {}}
+                            :groups {}
+                            :password ""}))
 
 (defn login
   [username password]
@@ -43,9 +43,12 @@
 
 (defn -main
   [& args]
-  (binding [*account* nil]
+  (binding [*account* nil
+            *session-cookie* nil]
     (let [res @(login (env :switchboard-admin-username)
                       (env :switchboard-admin-password))
           body (bs/to-string (:body res))]
       (assert (== (:status res) 200) body)
-      (set! *account* (json/parse-string body true)))))
+      (set! *account* (:result (json/parse-string body true)))
+      (set! *session-cookie* (get (:headers res) "set-cookie"))
+      (bs/to-string (:body @(create-account))))))
