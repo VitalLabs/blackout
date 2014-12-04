@@ -4,7 +4,8 @@
             [byte-streams :as bs]
             [clojure.core.async :refer :all
              :exclude [map into reduce merge take partition partition-by]]
-            [cheshire.core :as json]))
+            [cheshire.core :as json]
+            [clojure.tools.logging :as log]))
 
 (def ^:dynamic *host* "localhost")
 (def ^:dynamic *port* 8080)
@@ -22,15 +23,18 @@
 
 (defn create-account
   []
-  (post "/api/v1/accounts" {:action "create"
-                            :args {}
-                            :groups {}
-                            :password ""}))
+  (d/on-realized (post "/api/v1/accounts" {:action "create"
+                                           :args {:account ""
+                                                  :demog ""
+                                                  :auth ""
+                                                  :settings {}}
+                                           :groups {}
+                                           :password ""})
+                 (fn [x] (log/info x))
+                 (fn [x] (log/error x))))
 
 (defn -main
   [& {:keys [host port]}]
-  (binding [*host* host
-            *port* port]
+  (binding [*host* (or host *host*)
+            *port* (or port *port*)]
     ))
-
-
