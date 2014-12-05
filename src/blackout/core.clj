@@ -67,6 +67,19 @@
         (assoc :success-rate (/ (:num-success stats) (:num-requests stats)))
         (assoc :success-rate (/ (:num-success stats) (:num-requests stats))))))
 
+(defn simulate-population
+  [n]
+  )
+
+(defn chunk-requests
+  [f]
+  (comp (partition-all (.availableProcessors (Runtime/getRuntime)))
+        (map (fn [& xs]
+               (let [responses (mapv (fn [_] (f))
+                                     (range (count xs)))]
+                 (mapv deref responses))))
+        cat))
+
 (defn -main
   [& args]
   (binding [*account* nil
@@ -75,22 +88,19 @@
     (let [res @(login (env :switchboard-admin-username)
                       (env :switchboard-admin-password))
           body (slurp (:body res))]
+      
       (assert (== (:status res) 200) body)
+      
       (set! *account* (:result (json/parse-string body true)))
       (set! *session-cookie* (get (:headers res) :set-cookie))
-
-      (loop [responses []]
-        (if (< (count responses) 32)
-          (let [res (login (env :switchboard-admin-username)
-                           (env :switchboard-admin-password))]
-            (recur (conj responses res)))
-          (transduce (comp (map deref)
-                           (map (fn [res]
-                                  (update res :body json/parse-string))))
-                     (completing aggregate-request-stats)
-                     {:total-time 0
-                      :mean-latency 0
-                      :num-success 0
-                      :num-error 0
-                      :num-requests 0
-                      :success-rate 1.0} responses))))))
+      
+      (let [responses (into [] (chunk-requests create-account) (range 32))]
+        (transduce (comp (map (fn [res]
+                                (update res :body json/parse-string))))
+                   (completing aggregate-request-stats)
+                   {:total-time 0
+                    :mean-latency 0
+                    :num-success 0
+                    :num-error 0
+                    :num-requests 0
+                    :success-rate 1.0} responses)))))
