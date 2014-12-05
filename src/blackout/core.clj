@@ -53,13 +53,18 @@
 
 (defn aggregate-request-stats
   [stats res]
-  (let [stats (cond-> (update stats :num-requests inc)
+  (let [stats (cond-> (-> stats
+                          (update :num-requests inc)
+                          (update :total-time + (:server-time (:body res))))
                 (== (:status res) 200)
                 (update :num-success inc)
 
                 (not= (:status res) 200)
                 (update :num-error inc))]
+    (when (not= (:status res) 200)
+      (log/error (:body res)))
     (-> stats
+        (assoc :success-rate (/ (:num-success stats) (:num-requests stats)))
         (assoc :success-rate (/ (:num-success stats) (:num-requests stats))))))
 
 (defn -main
@@ -69,23 +74,23 @@
             *accounts* (atom #{})]
     (let [res @(login (env :switchboard-admin-username)
                       (env :switchboard-admin-password))
-          body (slurp (:body res))
-          agents (gen-agents)]
+          body (slurp (:body res))]
       (assert (== (:status res) 200) body)
       (set! *account* (:result (json/parse-string body true)))
       (set! *session-cookie* (get (:headers res) :set-cookie))
 
-      (loop [[a & more] (cycle agents)
-             responses []]
+      (loop [responses []]
         (if (< (count responses) 32)
-          (let [res (promise)]
-            (send a (fn [_] (deliver res @(create-account))))
-            (recur more (conj responses res)))
-          (transduce (comp (map deref))
+          (let [res (login (env :switchboard-admin-username)
+                           (env :switchboard-admin-password))]
+            (recur (conj responses res)))
+          (transduce (comp (map deref)
+                           (map (fn [res]
+                                  (update res :body json/parse-string))))
                      (completing aggregate-request-stats)
                      {:total-time 0
                       :mean-latency 0
                       :num-success 0
                       :num-error 0
                       :num-requests 0
-                      :success-rate 1} responses))))))
+                      :success-rate 1.0} responses))))))
