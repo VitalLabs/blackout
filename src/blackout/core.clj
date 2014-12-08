@@ -1,7 +1,5 @@
 (ns blackout.core
   (:require [clj-http.client :as http]
-            [manifold.deferred :as d]
-            [byte-streams :as bs]
             [clojure.core.async :refer :all
              :exclude [map into reduce merge take partition partition-by]]
             [cheshire.core :as json]
@@ -96,7 +94,8 @@
       
       (let [responses (into [] (chunk-requests create-account) (range 32))]
         (transduce (comp (map (fn [res]
-                                (update res :body json/parse-string))))
+                                (update res :body (comp json/parse-string
+                                                        slurp)))))
                    (completing aggregate-request-stats)
                    {:total-time 0
                     :mean-latency 0
