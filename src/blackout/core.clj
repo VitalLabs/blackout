@@ -5,101 +5,54 @@
             [cheshire.core :as json]
             [environ.core :refer [env]]
             [clojure.tools.logging :as log]
-            [clojure.test.check.generators :as gen]))
+            [com.stuartsierra.component :as c]
+            [riemann.client :as r]))
 
-(def ^:dynamic *account* nil)
-(def ^:dynamic *session-cookie* nil)
-(def ^:dynamic *accounts* nil)
+(defonce ^:const +threads+ (.availableProcessors (Runtime/getRuntime)))
 
 (defn make-uri
   [route]
   (str "http://" (env :switchboard-host) ":" (env :switchboard-port) route))
 
+(defonce cookie-store (clj-http.cookies/cookie-store))
+
 (defn post
-  [route body]
-  (http/post (make-uri route)
-             (merge {:content-type :json
-                     :accept :json
-                     :body (json/generate-string body)}
-                    (when *session-cookie*
-                      {:headers {:cookie *session-cookie*}}))))
-
-(defn gen-account
-  []
-  (let [username (last (gen/sample gen/string-alphanumeric 20))]
-    {:role (rand-nth ["admin" "user"])
-     :email (str username "@vitallabs.co")
-     :username username}))
-
-(defn create-account
-  []
-  (post "/api/v1/accounts" {:action "create"
-                            :args (gen-account)
-                            :groups {}
-                            :password ""}))
+  [url body]
+  (http/post (make-uri url) {:content-type :json
+                             :accept :json
+                             :body (json/generate-string body)
+                             :cookie-store cookie-store}))
 
 (defn login
   [username password]
   (post "/api/v1/login" {:action "login"
                          :args {:username username
-                                :password password
-                                :app 1}}))
+                                :password password}}))
 
-(defn gen-agents
+(defrecord Root [account agents]
+  c/Lifecycle
+  (start [this]
+    (if agents
+      this
+      (let [res (login (env :switchboard-admin-username)
+                       (env :switchboard-admin-password))
+            body (slurp (:body res))]
+        (assert (== (:status res) 200) body)
+        (assoc this
+          :account (json/parse-string body true)
+          :agents (repeatedly +threads+ #(agent nil))))))
+  (stop [this]
+    (if agents
+      (do (shutdown-agents)
+          (assoc this :agents nil))
+      this)))
+
+(defonce root (map->Root {}))
+
+(defn start-root
   []
-  (repeatedly (.availableProcessors (Runtime/getRuntime)) #(agent [])))
+  (alter-var-root #'root c/start))
 
-(defn aggregate-request-stats
-  [stats res]
-  (let [stats (cond-> (-> stats
-                          (update :num-requests inc)
-                          (update :total-time + (:server-time (:body res))))
-                (== (:status res) 200)
-                (update :num-success inc)
-
-                (not= (:status res) 200)
-                (update :num-error inc))]
-    (when (not= (:status res) 200)
-      (log/error (:body res)))
-    (-> stats
-        (assoc :success-rate (/ (:num-success stats) (:num-requests stats)))
-        (assoc :success-rate (/ (:num-success stats) (:num-requests stats))))))
-
-(defn simulate-population
-  [n]
-  )
-
-(defn chunk-requests
-  [f]
-  (comp (partition-all (.availableProcessors (Runtime/getRuntime)))
-        (map (fn [& xs]
-               (let [responses (mapv (fn [_] (f))
-                                     (range (count xs)))]
-                 (mapv deref responses))))
-        cat))
-
-(defn -main
-  [& args]
-  (binding [*account* nil
-            *session-cookie* nil
-            *accounts* (atom #{})]
-    (let [res @(login (env :switchboard-admin-username)
-                      (env :switchboard-admin-password))
-          body (slurp (:body res))]
-      
-      (assert (== (:status res) 200) body)
-      
-      (set! *account* (:result (json/parse-string body true)))
-      (set! *session-cookie* (get (:headers res) :set-cookie))
-      
-      (let [responses (into [] (chunk-requests create-account) (range 32))]
-        (transduce (comp (map (fn [res]
-                                (update res :body (comp json/parse-string
-                                                        slurp)))))
-                   (completing aggregate-request-stats)
-                   {:total-time 0
-                    :mean-latency 0
-                    :num-success 0
-                    :num-error 0
-                    :num-requests 0
-                    :success-rate 1.0} responses)))))
+(defn stop-root
+  []
+  (alter-var-root #'root c/stop))
