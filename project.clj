@@ -9,7 +9,7 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [com.stuartsierra/component "0.2.2"]
                  [riemann-clojure-client "0.2.11"]
-                 [aleph "0.4.0-alpha9"]  
+                 [clj-http "1.0.1"]  
                  [cheshire "5.3.1"]
                  [environ "1.0.0"]
                  [org.slf4j/slf4j-log4j12 "1.7.7"]

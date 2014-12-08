@@ -1,5 +1,5 @@
 (ns blackout.core
-  (:require [aleph.http :as http]
+  (:require [clj-http.client :as http]
             [manifold.deferred :as d]
             [byte-streams :as bs]
             [clojure.core.async :refer :all
