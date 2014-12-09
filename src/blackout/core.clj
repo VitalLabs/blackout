@@ -22,6 +22,10 @@
   ([event] (r/send-event riemann-client event))
   ([event ack] (r/send-event riemann-client event ack)))
 
+(defn send-events
+  ([events] (r/send-events riemann-client events))
+  ([events ack] (r/send-events riemann-client events ack)))
+
 (defn q
   [query]
   (r/query riemann-client query))
@@ -37,14 +41,14 @@
           {:keys [server-time]} (:body res)
           route (str/replace (:url req) (re-pattern (make-uri "")) "")
           status (if (== status 200) "OK" "ERROR")]
-      (send-event {:service "switchboard request time (ms)"
-                   :state status
-                   :route route
-                   :metric server-time})
-      (send-event {:service "total request time (ms)"
-                   :state status
-                   :route route
-                   :metric request-time})
+      (send-events {:service "switchboard request time (ms)"
+                    :state status
+                    :route route
+                    :metric server-time}
+                   {:service "total request time (ms)"
+                    :state status
+                    :route route
+                    :metric request-time})
       res)))
 
 (defn wrap-json-body
