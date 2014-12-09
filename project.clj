@@ -19,6 +19,6 @@
                                                     com.sun.jmx/jmxri]]]
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]]
                    :source-paths ["dev"]
-                   :env {:switchboard-host "localhost"
+                   :env {:switchboard-host "127.0.0.1"
                          :switchboard-port 8080}}}
   :plugins [[lein-environ "1.0.0"]])

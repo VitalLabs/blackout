@@ -10,11 +10,14 @@
 
 (defonce ^:const +threads+ (.availableProcessors (Runtime/getRuntime)))
 
+(defonce cookie-store (clj-http.cookies/cookie-store))
+
+(defonce switchboard (r/tcp-client {:host (str (env :switchboard-host) ":"
+                                               (env :switchboard-port))}))
+
 (defn make-uri
   [route]
   (str "http://" (env :switchboard-host) ":" (env :switchboard-port) route))
-
-(defonce cookie-store (clj-http.cookies/cookie-store))
 
 (defn post
   [url body]
