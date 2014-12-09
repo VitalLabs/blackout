@@ -27,7 +27,8 @@
   [username password]
   (post "/api/v1/login" {:action "login"
                          :args {:username username
-                                :password password}}))
+                                :password password
+                                :app 1}}))
 
 (defrecord Root [account agents]
   c/Lifecycle

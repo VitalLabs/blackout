@@ -12,7 +12,7 @@ b. `sudo gem install riemann-client riemann-tools riemann-dash`
 
 c. `riemann /usr/local/etc/riemann.config` 
 
-d. `riemann-dash`
+d. `sudo riemann-dash` (sudo is necessary to permit writes for config saves)
 
 e. Open your web browser to http://localhost:4567
 
