@@ -9,6 +9,7 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [com.stuartsierra/component "0.2.2"]
                  [riemann-clojure-client "0.2.12"]
+                 [riemann-jvm-profiler "0.1.0"]
                  [clj-http "1.0.1"]
                  [cheshire "5.3.1"]
                  [environ "1.0.0"]
