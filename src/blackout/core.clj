@@ -7,6 +7,8 @@
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as c]
             [riemann.client :as r]
+            [riemann.codec :as codec]
+            [riemann.jvm-profiler :as jvm]
             [clojure.string :as str]))
 
 (defonce ^:const +threads+ (.availableProcessors (Runtime/getRuntime)))
@@ -30,8 +32,8 @@
     (let [{:keys [status body request-time] :as res} (handler req)
           {:keys [server-time]} (:body res)
           route (str/replace (:url req) (re-pattern (make-uri "")) "")]
-      (send-event {:server-time server-time
-                   :request-time request-time
+      (send-event {:server-time (str server-time)
+                   :request-time (str request-time)
                    :route route})
       res)))
 
@@ -62,18 +64,22 @@
                                          :password password
                                          :app 1}}))
 
-(defrecord Root [account agents]
+(defrecord Root [account agents profiler]
   c/Lifecycle
   (start [this]
     (if agents
       this
       (let [res (login (env :switchboard-admin-username)
                        (env :switchboard-admin-password))
-            body (slurp (:body res))]
+            body (:body res)]
         (assert (== (:status res) 200) body)
         (assoc this
-          :account (json/parse-string body true)
-          :agents (repeatedly +threads+ #(agent nil))))))
+          :account (:result body)
+          :agents (repeatedly +threads+ #(agent nil))
+          :profiler (jvm/start-global! {:host (env :riemann-host)
+                                        :port (env :riemann-port)
+                                        :prefix "switchboard"
+                                        :load 0.05})))))
   (stop [this]
     (if agents
       (do (shutdown-agents)
