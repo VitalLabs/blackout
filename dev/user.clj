@@ -10,25 +10,28 @@
    [clojure.set :as set]
    [clojure.string :as str]
    [clojure.test :as test]
-   [clojure.tools.namespace.repl :refer [refresh refresh-all]]))
+   [clojure.tools.namespace.repl :refer [refresh refresh-all]]
+   [com.stuartsierra.component :as c]
+   [blackout.core :refer [map->Root]]))
 
-(def system
-  "A Var containing an object representing the application under
-  development.")
+(defonce system {})
 
 (defn init
   "Creates and initializes the system under development in the Var
   #'system."
-  [])
+  []
+  (alter-var-root #'system map->Root))
 
 (defn start
   "Starts the system running, updates the Var #'system."
-  [])
+  []
+  (alter-var-root #'system c/start))
 
 (defn stop
   "Stops the system if it is currently running, updates the Var
   #'system."
-  [])
+  []
+  (alter-var-root #'system c/stop))
 
 (defn go
   "Initializes and starts the system running."

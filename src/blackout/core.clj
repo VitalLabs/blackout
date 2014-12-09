@@ -46,13 +46,3 @@
       (do (shutdown-agents)
           (assoc this :agents nil))
       this)))
-
-(defonce root (map->Root {}))
-
-(defn start-root
-  []
-  (alter-var-root #'root c/start))
-
-(defn stop-root
-  []
-  (alter-var-root #'root c/stop))
