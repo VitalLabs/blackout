@@ -12,8 +12,8 @@
 
 (defonce cookie-store (clj-http.cookies/cookie-store))
 
-(defonce switchboard (r/tcp-client {:host (str (env :switchboard-host) ":"
-                                               (env :switchboard-port))}))
+(defonce switchboard (r/tcp-client {:host (env :switchboard-host)
+                                    :port (env :switchboard-port)}))
 
 (defn make-uri
   [route]
