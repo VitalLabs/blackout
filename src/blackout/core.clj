@@ -22,6 +22,10 @@
   ([event] (r/send-event riemann-client event))
   ([event ack] (r/send-event riemann-client event ack)))
 
+(defn q
+  []
+  )
+
 (defn make-uri
   [route]
   (str "http://" (env :switchboard-host) ":" (env :switchboard-port) route))
@@ -32,9 +36,12 @@
     (let [{:keys [status body request-time] :as res} (handler req)
           {:keys [server-time]} (:body res)
           route (str/replace (:url req) (re-pattern (make-uri "")) "")]
-      (send-event {:server-time (str server-time)
-                   :request-time (str request-time)
-                   :route route})
+      (send-event {:service (str route " server-time")
+                   :state "running"
+                   :metric server-time})
+      (send-event {:service (str route " request-time")
+                   :state "running"
+                   :metric request-time})
       res)))
 
 (defn wrap-json-body
