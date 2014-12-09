@@ -23,8 +23,8 @@
   ([event ack] (r/send-event riemann-client event ack)))
 
 (defn q
-  []
-  )
+  [query]
+  (r/query riemann-client query))
 
 (defn make-uri
   [route]
