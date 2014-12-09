@@ -6,7 +6,8 @@
             [environ.core :refer [env]]
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as c]
-            [riemann.client :as r]))
+            [riemann.client :as r]
+            [clojure.string :as str]))
 
 (defonce ^:const +threads+ (.availableProcessors (Runtime/getRuntime)))
 
@@ -23,19 +24,43 @@
   [route]
   (str "http://" (env :switchboard-host) ":" (env :switchboard-port) route))
 
-(defn post
-  [url body]
-  (http/post (make-uri url) {:content-type :json
-                             :accept :json
-                             :body (json/generate-string body)
-                             :cookie-store cookie-store}))
+(defn wrap-riemann-trace
+  [handler]
+  (fn [req]
+    (let [{:keys [status body request-time] :as res} (handler req)
+          {:keys [server-time]} (:body res)
+          route (str/replace (:url req) (re-pattern (make-uri "")) "")]
+      (send-event {:server-time server-time
+                   :request-time request-time
+                   :route route})
+      res)))
+
+(defn wrap-json-body
+  [handler]
+  (fn [req]
+    (update (handler req) :body json/parse-string true)))
+
+(defn request
+  ([url] (request :get url))
+  ([method url] (request method url nil))
+  ([method url body]
+   (http/with-middleware (conj http/*current-middleware*
+                               wrap-json-body
+                               wrap-riemann-trace)
+     (let [options {:content-type :json
+                    :accept :json
+                    :cookie-store cookie-store}]
+       (case method
+         :get (http/get (make-uri url) options)
+         :post (let [body (json/generate-string body)]
+                 (http/post (make-uri url) (assoc options :body body))))))))
 
 (defn login
   [username password]
-  (post "/api/v1/login" {:action "login"
-                         :args {:username username
-                                :password password
-                                :app 1}}))
+  (request :post "/api/v1/login" {:action "login"
+                                  :args {:username username
+                                         :password password
+                                         :app 1}}))
 
 (defrecord Root [account agents]
   c/Lifecycle
