@@ -35,12 +35,15 @@
   (fn [req]
     (let [{:keys [status body request-time] :as res} (handler req)
           {:keys [server-time]} (:body res)
-          route (str/replace (:url req) (re-pattern (make-uri "")) "")]
+          route (str/replace (:url req) (re-pattern (make-uri "")) "")
+          status (if (== status 200) "OK" "ERROR")]
       (send-event {:service "switchboard request time (ms)"
-                   :state "running"
+                   :state status
+                   :route route
                    :metric server-time})
       (send-event {:service "total request time (ms)"
-                   :state "running"
+                   :state status
+                   :route route
                    :metric request-time})
       res)))
 
