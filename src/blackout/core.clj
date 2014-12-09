@@ -12,8 +12,12 @@
 
 (defonce cookie-store (clj-http.cookies/cookie-store))
 
-(defonce switchboard (r/tcp-client {:host (env :switchboard-host)
-                                    :port (env :switchboard-port)}))
+(defonce riemann-client (r/tcp-client {:host (env :riemann-host)
+                                       :port (env :riemann-port)}))
+
+(defn send-event
+  ([event] (r/send-event switchboard event))
+  ([event ack] (r/send-event switchboard event ack)))
 
 (defn make-uri
   [route]
