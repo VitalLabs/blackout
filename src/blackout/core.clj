@@ -16,8 +16,8 @@
                                        :port (env :riemann-port)}))
 
 (defn send-event
-  ([event] (r/send-event switchboard event))
-  ([event ack] (r/send-event switchboard event ack)))
+  ([event] (r/send-event riemann-client event))
+  ([event ack] (r/send-event riemann-client event ack)))
 
 (defn make-uri
   [route]
