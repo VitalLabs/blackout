@@ -36,10 +36,10 @@
     (let [{:keys [status body request-time] :as res} (handler req)
           {:keys [server-time]} (:body res)
           route (str/replace (:url req) (re-pattern (make-uri "")) "")]
-      (send-event {:service (str route " server-time")
+      (send-event {:service "switchboard request time (ms)"
                    :state "running"
                    :metric server-time})
-      (send-event {:service (str route " request-time")
+      (send-event {:service "total request time (ms)"
                    :state "running"
                    :metric request-time})
       res)))
