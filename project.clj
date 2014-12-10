@@ -18,10 +18,12 @@
                                                     javax.jms/jms
                                                     com.sun.jmdk/jmxtools
                                                     com.sun.jmx/jmxri]]]
+  :main ^:skip-aot blackout.main
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]]
                    :source-paths ["dev"]
                    :env {:switchboard-host "127.0.0.1"
                          :switchboard-port 8080
                          :riemann-host "127.0.0.1"
-                         :riemann-port 5555}}}
+                         :riemann-port 5555}}
+             :uberjar {:aot :all}}
   :plugins [[lein-environ "1.0.0"]])
