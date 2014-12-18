@@ -41,14 +41,12 @@
           {:keys [server-time]} (:body res)
           route (str/replace (:url req) (re-pattern (make-uri "")) "")
           status (if (== status 200) "OK" "ERROR")]
-      (send-events {:service "switchboard request time (ms)"
-                    :state status
-                    :route route
-                    :metric server-time}
-                   {:service "total request time (ms)"
-                    :state status
-                    :route route
-                    :metric request-time})
+      (send-event {:service "switchboard request time (ms)"
+                   :state status
+                   :metric server-time})
+      (send-event {:service "total request time (ms)"
+                   :state status
+                   :metric request-time})
       res)))
 
 (defn wrap-json-body
