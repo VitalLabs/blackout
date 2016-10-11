@@ -7,6 +7,8 @@
   []
   {"CLASSPATH" (System/getProperty "java.class.path")})
 
+;; TODO: Designated master node will launch Reimann server and Reimann
+;; dashboard, if installed. Make sure to shut down processes when closing!
 (defn -main
   [& args]
   (if-let [cfg (io/resource "riemann.config")]
