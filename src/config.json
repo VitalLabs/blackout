@@ -1,0 +1,106 @@
+{
+  "server": "127.0.0.1:5556",
+  "server_type": "ws",
+  "workspaces": [
+    {
+      "name": "Riemann",
+      "view": {
+        "type": "Balloon",
+        "weight": 1,
+        "id": "30b10acdf76e86f25b998f72860cb5900e833df7",
+        "version": 15,
+        "child": {
+          "type": "VStack",
+          "weight": 1,
+          "id": "6a95c295b2bf65cb7e269f905b63be37ef49d793",
+          "version": 15,
+          "children": [
+            {
+              "type": "Title",
+              "weight": 0.125,
+              "id": "4f99ce136dc32f897007dfe2e46f80249b57d1b7",
+              "version": 6,
+              "title": "Switchboard"
+            },
+            {
+              "type": "HStack",
+              "weight": 1,
+              "id": "2fffc92494ac36a7b9e6a188781fe0fa238521f4",
+              "version": 9,
+              "children": [
+                {
+                  "type": "VStack",
+                  "weight": 1,
+                  "id": "1417089a97e1d3956f3fad12b7ca23a76f337b55",
+                  "version": 6,
+                  "children": [
+                    {
+                      "type": "Flot",
+                      "weight": 1,
+                      "id": "173d5874211b9e24c76afe76153b4789987ce457",
+                      "version": 2,
+                      "title": "Total Request Time",
+                      "query": "service = \"client request time (ms)\"",
+                      "min": null,
+                      "max": null,
+                      "timeRange": 300,
+                      "graphType": "line",
+                      "stackMode": "false",
+                      "tooltips": "metric"
+                    },
+                    {
+                      "type": "Log",
+                      "weight": 1,
+                      "id": "92ad19f406ba8c4de85ea21ed30e0f80ae7e553c",
+                      "version": 4,
+                      "title": "Recent events",
+                      "query": "true",
+                      "lines": "10"
+                    }
+                  ]
+                },
+                {
+                  "type": "VStack",
+                  "weight": 1,
+                  "id": "1690c01a5ff56e6806b141514ee3d4f3dd08710a",
+                  "version": 3,
+                  "children": [
+                    {
+                      "type": "Flot",
+                      "weight": 1,
+                      "id": "61530d514203f1414be9e1494c2d5ee57e3fe130",
+                      "version": 2,
+                      "title": "Server Request Time",
+                      "query": "service = \"server request time (ms)\"",
+                      "min": null,
+                      "max": null,
+                      "timeRange": 300,
+                      "graphType": "line",
+                      "stackMode": "false",
+                      "tooltips": "metric"
+                    },
+                    {
+                      "type": "Flot",
+                      "weight": 1,
+                      "id": "06904de96c52ed942780b2146649b7a32818b962",
+                      "version": 1,
+                      "title": "Signal Reponse Time",
+                      "query": "service = \"signal response time (ms)\"",
+                      "min": null,
+                      "max": null,
+                      "timeRange": 300,
+                      "graphType": "line",
+                      "stackMode": "false",
+                      "tooltips": "metric"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "id": "af27ef376eed56c235287660df447e40f0e138f6"
+    }
+  ]
+}

@@ -22,7 +22,7 @@
                  [clj-gatling "0.8.3"]
                  [riemann-clojure-client "0.4.2"]
                  #_[riemann-jvm-profiler "0.1.0"]]
-;  :main ^:skip-aot blackout.main
+  :main ^:skip-aot blackout.main
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]]
                    :source-paths ["dev"]
                    :env {:switchboard-host "127.0.0.1"
