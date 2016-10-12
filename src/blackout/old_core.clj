@@ -1,4 +1,4 @@
-(ns blackout.core
+(ns blackout.old-core
   (:require [clj-http.client :as http]
             [clojure.core.async :refer :all
              :exclude [map into reduce merge take partition partition-by]]
