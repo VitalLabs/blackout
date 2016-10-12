@@ -25,6 +25,4 @@
         }
        options))))
 
-(defn -main [simulation users requests & [options]]
-  (run (keyword simulation) (read-string users) (read-string requests)))
 

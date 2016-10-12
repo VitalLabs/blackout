@@ -1,21 +1,36 @@
 (ns blackout.main
   (:gen-class)
   (:require [clojure.java.shell :refer [sh with-sh-env]]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [blackout.core :as blackout]))
 
 (defn classpath
   []
   {"CLASSPATH" (System/getProperty "java.class.path")})
 
-;; TODO: Designated master node will launch Reimann server and Reimann
-;; dashboard, if installed. Make sure to shut down processes when closing!
-(defn -main
-  [& args]
+(defn launch-riemann
+  []
   (if-let [cfg (io/resource "riemann.config")]
     (with-sh-env (classpath)
       (let [result (sh "riemann" (.getPath cfg))]
         (if-not (empty? (:err result))
           (println (:err result))
           (println (:out result)))))
-    (throw (ex-info "riemann.config not found in classpath" {})))
+    (throw (ex-info "riemann.config not found in classpath" {}))))
+
+(defn launch-riemann-dash
+  []
+  (with-sh-env (classpath)
+    (let [result (sh "riemann-dash")]
+      (if-not (empty? (:err result))
+        (println (:err result))
+        (println (:out result))))))
+
+(defn -main
+  [simulation users requests & [options]]
+  (when (not (empty? options)) ;; TO DEBUG, on cluster devops launches these already
+    (launch-riemann)
+    (launch-riemann-dash))
+  (blackout/run (keyword simulation) (read-string users) (read-string requests))
   (System/exit 0))
+
