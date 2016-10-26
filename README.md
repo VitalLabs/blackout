@@ -57,7 +57,17 @@ e. Open your web browser to http://localhost:4567
 
 ## Pre-requisites for distributed testing
 
-TODO
+1. Install Riemann on a test server
+
+2. SSH with '-L 5556:localhost:5556' and run 'riemann'
+
+3. SSH with '-L 4567:localhost:4567' and run 'sudo riemann-dash'
+
+4. cd /var/lib/blackout; lein repl
+
+5. (do (require 'blackout.core) (in-ns 'blackout.core))
+
+6. (run :login 10 2 {:context {:username "eslick" :password "password"}})
 
 ## Roadmap
 

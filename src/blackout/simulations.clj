@@ -12,10 +12,11 @@
    response channel, return a response channel
    that "
   [ch]
-  (async/map #(cond
-                (map? %) (= (:status %) 200)
-                (sequential? %) (= (:status (first %)) 200)
-                :default false)
+  (async/map (fn [response]
+               (cond
+                (map? response) (= (:status response) 200)
+                (sequential? response) (= (:status (first response)) 200)
+                :default false))
              [ch]))
 
 ;; PING
