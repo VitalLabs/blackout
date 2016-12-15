@@ -8,9 +8,6 @@
             [blackout.riemann :as r])
   (:import [com.auth0.Auth0]))
 
-;(defonce cookie-store (clj-http.cookies/cookie-store))
-
-
 (def config
   {:base-uri "https://master.sb.vitallabs.co"})
 
@@ -31,6 +28,7 @@
     response))
 
 (defn response-time
+  "Example of how to include server-provided response time in riemann output"
   [response]
   (-> response
       (assoc :request-time

@@ -76,21 +76,28 @@ When using Mac OS X, issue the following commands at the terminal:
 
 3. SSH with '-L 4567:localhost:4567' and run 'sudo riemann-dash'
 
-4. Install [leiningen](
+4. Install [leiningen](http://leiningen.org/)
 
 4. cd /var/lib/blackout; lein repl
 
 5. (do (require 'blackout.core) (in-ns 'blackout.core))
 
-6. (run :login 10 2 {:context {:username "eslick" :password "password"}})
+6. (run blackout.sb/simulations :login 10 2 {:context {:username "eslick" :password "password"}})
+
 
 ## Roadmap
 
-- How to make load testing more generic?
+
+### Development
+
+- How to make load testing more generic with external simulation files?
+- Standard way to configure credentials via context with external sources
 - Use clojurecast to allow distributed test generators to coordinate, e.g. unique name generation.
 - Use spec.test and/or simulant to generate test cases against specific APIs
-- Ansible script for configuring a test node to run riemann, riemann
-dash, blackout from a JAR and connect to upstream Reimann server
+
+### Support
+
+- Ansible script for configuring a test node to run riemann, riemann-dash, blackout from a JAR and connect to upstream Reimann server
 - Ansible script for creating a cluster of test nodes
 - Parse a simple DSL for trivial testing based on a file located on
   the classpath, e.g. using CURL styel commands for individual steps
