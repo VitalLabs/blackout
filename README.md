@@ -42,21 +42,6 @@ master node.  Streaming to Reimann is distributed.
 
 ## Pre-requisites for local testing
 
-1. Install Riemann and associated tools
-
-When using Mac OS X, issue the following commands at a terminal: 
-
-  a. `brew install riemann`
-  b. `sudo gem install riemann-client riemann-tools riemann-dash`
-
-2. Run Riemann and Riemann Dash
-
-  a. `riemann ./src/riemann.config` 
-  b. `sudo riemann-dash ./src/config.json` (sudo is necessary to permit writes for config saves)
-  c. Open your web browser to http://localhost:4567 to see Riemann real-time stats
-
-3. Run Blackout
-
 Blackout can be run from the command line via `lein run` or
 interactively via `lein repl`.  At the command line, the arguments to
 run are `<namespace> <simulation> <num_users> <request_count>`.  The
@@ -68,8 +53,20 @@ The number of users dictates the number of concurrent simulation
 agents and the number of requests is approximately how many
 back-to-back requests all the simulations together will execute
 
-  a. Run a blackout simulation `lein run blackout.sb ping 5 100`
-  b. After, open report file, e.g. `open /tmp/20161215220318568/index.html`
+When using Mac OS X, issue the following commands at the terminal: 
+
+1. Install Riemann and associated tools
+    1. `brew install riemann`
+    2. `sudo gem install riemann-client riemann-tools riemann-dash`
+
+2. Run Riemann and Riemann Dash
+    1. `riemann ./src/riemann.config` 
+    2. `sudo riemann-dash ./src/config.json` (sudo is necessary to permit writes for config saves)
+    3. Open your web browser to http://localhost:4567 to see Riemann real-time stats
+
+3. Run Blackout
+    1. Run a blackout simulation `lein run blackout.sb ping 5 100`
+    2. After, open report file, e.g. `open /tmp/20161215220318568/index.html`
 
 ## Pre-requisites for remote testing
 
