@@ -27,10 +27,13 @@
         (println (:out result))))))
 
 (defn -main
-  [simulation users requests & [options]]
-  (when (not (empty? options)) ;; TO DEBUG, on cluster devops launches these already
-    (launch-riemann)
-    (launch-riemann-dash))
-  (blackout/run (keyword simulation) (read-string users) (read-string requests))
-  (System/exit 0))
+  [sim-ns simulation users requests & [options]]
+  (let [ns (symbol sim-ns)
+        _ (require ns)
+        app (resolve (symbol sim-ns "simulations"))]
+    (when (not (empty? options)) ;; TO DEBUG, on cluster devops launches these already
+      (launch-riemann)
+      (launch-riemann-dash))
+    (blackout/run (var-get app) (keyword simulation) (read-string users) (read-string requests) {})
+    (System/exit 0)))
 

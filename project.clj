@@ -20,6 +20,7 @@
                  [com.hazelcast/hazelcast-all "3.7.2"]
                  [org.clojurecast/clojurecast "0.1.3"]
                  [clj-gatling "0.8.3"]
+                 [com.auth0/auth0 "0.4.0"] ;; for SB simulations
                  [riemann-clojure-client "0.4.2"]
                  #_[riemann-jvm-profiler "0.1.0"]]
   :main ^:skip-aot blackout.main
